@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="TaskCleverence.Task1.Core/TaskCleverence.Task1.Core.csproj" />
+  <Project Path="TaskCleverence.Task1.Tests/TaskCleverence.Task1.Tests.csproj" />
+</Solution>
