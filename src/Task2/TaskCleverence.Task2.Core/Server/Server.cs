@@ -13,7 +13,7 @@ public static class Server
     /// <summary>
     /// Обеспечивает потокобезопасное параллельное чтение и одну запись
     /// </summary>
-    private readonly static ReaderWriterLockSlim _readerWriterLockSlim = new();
+    private static readonly ReaderWriterLockSlim _lock = new();
 
     /// <summary>
     /// Возвращает текущее значение счётчика
@@ -21,7 +21,7 @@ public static class Server
     /// <returns>Текущее значение <see cref="_count"/></returns>
     public static int GetCount()
     {
-        _readerWriterLockSlim.EnterReadLock();
+        _lock.EnterReadLock();
 
         try
         {
@@ -29,7 +29,7 @@ public static class Server
         }
         finally
         {
-            _readerWriterLockSlim.ExitReadLock();
+            _lock.ExitReadLock();
         }
     }
 
@@ -39,11 +39,10 @@ public static class Server
     /// <param name="value">Значение для добавления к счётчику</param>
     public static void AddToCount(int value)
     {
-        _readerWriterLockSlim.EnterWriteLock();
+        _lock.EnterWriteLock();
 
         try
         {
-            // тут можно использовать checked чтобы получить исключение при переполнении int
             checked
             {
                 _count += value;
@@ -51,7 +50,7 @@ public static class Server
         }
         finally
         {
-            _readerWriterLockSlim.ExitWriteLock();
+            _lock.ExitWriteLock();
         }
     }
 
@@ -61,7 +60,7 @@ public static class Server
     /// </summary>
     public static void Reset()
     {
-        _readerWriterLockSlim.EnterWriteLock();
+        _lock.EnterWriteLock();
 
         try
         {
@@ -69,7 +68,15 @@ public static class Server
         }
         finally
         {
-            _readerWriterLockSlim.ExitWriteLock();
+            _lock.ExitWriteLock();
         }
+    }
+
+    /// <summary>
+    /// Освобождает ресурсы блокировки
+    /// </summary>
+    public static void Dispose()
+    {
+        _lock.Dispose();
     }
 }
